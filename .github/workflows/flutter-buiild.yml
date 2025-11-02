@@ -1,0 +1,36 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.13.10"  # change to your Flutter version
+
+      # 3️⃣ Debug: list files to confirm pubspec.yaml exists
+      - name: List repo files
+        run: ls -l
+
+      # 4️⃣ Get Flutter dependencies
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # 5️⃣ Build APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      
