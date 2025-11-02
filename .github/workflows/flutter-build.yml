@@ -1,38 +1,42 @@
-name: Flutter Android Build & Release (Mcosyst)
+name: Build Flutter APK & AAB
 
 on:
   push:
     branches:
-      - main   # Runs on every push to main branch
-  workflow_dispatch:  # Allows manual trigger from Actions tab
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build APK & AAB
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.13.3'  # or your preferred version
+      - name: Set up Flutter (latest stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'latest'
+          channel: 'stable'
 
-    - name: Install dependencies
-      run: flutter pub get
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Build APK (release)
-      run: flutter build apk --release
+      - name: Build Release APK
+        run: flutter build apk --release
 
-    - name: Build AAB (release)
-      run: flutter build appbundle --release
+      - name: Build Release AAB (Play Store bundle)
+        run: flutter build appbundle --release
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: mcosyst-listener-build
-        path: |
-          build/app/outputs/flutter-apk/app-release.apk
-          build/app/outputs/bundle/release/app-release.aab
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mcosyst-Listen-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mcosyst-Listen-AAB
+          path: build/app/outputs/bundle/release/app-release.aab
