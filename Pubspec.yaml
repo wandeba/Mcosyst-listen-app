@@ -1,0 +1,16 @@
+- name: Install dependencies
+      run: cd app && flutter pub get
+
+    - name: Build APK (release)
+      run: cd app && flutter build apk --release
+
+    - name: Build AAB (release)
+      run: cd app && flutter build appbundle --release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: mcosyst-listener-build
+        path: |
+          app/build/app/outputs/flutter-apk/app-release.apk
+          app/build/app/outputs/bundle/release/app-release.aab
