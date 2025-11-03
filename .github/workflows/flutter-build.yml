@@ -1,3 +1,4 @@
+
 name: Build Flutter APK & AAB
 
 on:
@@ -14,29 +15,48 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up Flutter (latest stable)
-        uses: subosito/flutter-action@v2
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          flutter-version: 'latest'
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: flutter/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'  # Updated to latest stable version
           channel: 'stable'
+          cache: true
+          cache-key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Show Flutter version
+        run: flutter --version
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify Flutter installation
+        run: flutter doctor
+
+      - name: Run tests
+        run: flutter test
+
       - name: Build Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Build Release AAB (Play Store bundle)
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --verbose
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: Mcosyst-Listen-APK
           path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: Mcosyst-Listen-AAB
           path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
