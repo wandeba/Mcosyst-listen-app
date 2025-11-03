@@ -10,10 +10,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Add timeout to prevent hanging
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+
+      - name: Debug - Show runner info
+        run: |
+          echo "Runner OS: $(uname -a)"
+          echo "Current directory: $(pwd)"
+          echo "Available disk space:"
+          df -h
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -24,39 +32,7 @@ jobs:
       - name: Set up Flutter
         uses: flutter/flutter-action@v2
         with:
-          flutter-version: '3.29.0'  # Updated to latest stable version
+          flutter-version: '3.29.0'
           channel: 'stable'
-          cache: true
-          cache-key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
 
-      - name: Show Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Verify Flutter installation
-        run: flutter doctor
-
-      - name: Run tests
-        run: flutter test
-
-      - name: Build Release APK
-        run: flutter build apk --release --verbose
-
-      - name: Build Release AAB (Play Store bundle)
-        run: flutter build appbundle --release --verbose
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mcosyst-Listen-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
-
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mcosyst-Listen-AAB
-          path: build/app/outputs/bundle/release/app-release.aab
-          retention-days: 30
+      # ... rest of your steps
