@@ -3,25 +3,15 @@ name: Build Flutter APK & AAB
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Add timeout to prevent hanging
-
     steps:
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Debug - Show runner info
-        run: |
-          echo "Runner OS: $(uname -a)"
-          echo "Current directory: $(pwd)"
-          echo "Available disk space:"
-          df -h
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -30,9 +20,29 @@ jobs:
           java-version: '17'
 
       - name: Set up Flutter
-        uses: flutter/flutter-action@v2
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.29.0'
           channel: 'stable'
+          cache: true
 
-      # ... rest of your steps
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      - name: Build Release AAB
+        run: flutter build appbundle --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mcosyst-Listen-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mcosyst-Listen-AAB
+          path: build/app/outputs/bundle/release/app-release.aab
